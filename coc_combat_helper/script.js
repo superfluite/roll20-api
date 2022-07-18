@@ -6,10 +6,11 @@ on("chat:message", function(msg) {
         var apiMsgPrefix = '!ch';
         var apiMsgStart = apiMsgPrefix + ' start ';
         var apiMsgEnd = apiMsgPrefix + ' end';
-        if (msg.content.indexOf(apiMsgStart) === 0 && currentCombatList.length === 0) {
-            try {
+
+        try {
+            // 전투 시작(!ch start)
+            if (msg.content.indexOf(apiMsgStart) === 0 && !isCombating()) {
                 const msgContent = msg.content.replace(apiMsgStart, '');
-                const characters = findObjs({'type': 'character'});
                 const characterNameList = msgContent.split(',');
                 var characterList = filterObjs(
                     function(obj){
@@ -25,25 +26,26 @@ on("chat:message", function(msg) {
                 sendChat('', '/desc ' + resultText);
 
                 log(currentCombatList);
-            } catch (err) {
-                sendChat('error','/w GM '+err,null,{noarchive:true});
             }
-        }
-        
-        if (msg.content.indexOf(apiMsgEnd) === 0 && currentCombatList.length > 0) {
-            try {
-                const msgContent = msg.content.replace(apiMsgStart, '');
+
+            // 전투 종료(!ch end)
+            if (msg.content.indexOf(apiMsgEnd) === 0 && isCombating()) {
                 currentCombatList.length = 0;
-                sendChat('', '/desc 전투 종료');
+                currentCombatOrder = 0;
+                sendChat('', '/desc ▲ 전투 종료 ▲');
 
                 log(currentCombatList);
-            } catch (err) {
-                sendChat('error','/w GM '+err,null,{noarchive:true});
             }
+        } catch (err) {
+            sendChat('error','/w GM '+err,null,{noarchive:true});
         }
     }
 });
 
 function getCharacterDex(charId) {
-    return parseInt(getAttrByName(charId, 'dex'))
+    return parseInt(getAttrByName(charId, 'dex'));
+}
+
+function isCombating() {
+    return currentCombatList.length > 0;
 }
