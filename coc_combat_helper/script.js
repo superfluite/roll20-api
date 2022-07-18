@@ -49,14 +49,18 @@ on("chat:message", function(msg) {
     }
 });
 
+function getCharacterIntAttr(charId, attr) {
+    return parseInt(getAttrByName(charId, attr));
+}
+
 function getCharacterDex(charId) {
-    return parseInt(getAttrByName(charId, 'dex'));
+    return getCharacterIntAttr(charId, 'dex');
 }
 
 function getCharacterHP(charId, max=false) {
-    const hp = parseInt(getAttrByName(charId, 'hp', max ? 'max' : 'current'));
+    const hp = getCharacterIntAttr(charId, 'hp', max ? 'max' : 'current');
     if (isNaN(hp)) {
-        hp = (parseInt(getAttrByName(charId, 'con')) + parseInt(getAttrByName(charId, 'siz'))) % 10;
+        hp = (getCharacterIntAttr(charId, 'con') + getCharacterIntAttr(charId, 'siz')) % 10;
     }
     return hp
 }
