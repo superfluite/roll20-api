@@ -53,6 +53,14 @@ function getCharacterDex(charId) {
     return parseInt(getAttrByName(charId, 'dex'));
 }
 
+function getCharacterHP(charId, max=false) {
+    const hp = parseInt(getAttrByName(charId, 'hp', max ? 'max' : 'current'));
+    if (isNaN(hp)) {
+        hp = (parseInt(getAttrByName(charId, 'con')) + parseInt(getAttrByName(charId, 'siz'))) % 10;
+    }
+    return hp
+}
+
 function isCombating() {
     return currentCombatList.length > 0;
 }
@@ -62,7 +70,7 @@ function showCurrentCombatList() {
     const currentStyle = '[%s](#" style="font-weight:bold; font-style:normal;)';
     const resultText = currentCombatList.map(
         function(obj, index){
-            const turn = obj.get('name') + '(' + getCharacterDex(obj.id) + ')';
+            const turn = obj.get('name') + '(' + getCharacterDex(obj.id) + ', ' + getCharacterHP(obj.id) + '/' + getCharacterHP(obj.id, true) + ')';
             return index === currentCombatOrder ? currentStyle.replace('%s', turn) : style.replace('%s', turn);
         }
     ).join(' [>>](#" style="font-weight:normal; font-style:normal;) ');
