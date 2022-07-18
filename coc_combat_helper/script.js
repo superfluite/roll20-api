@@ -5,6 +5,7 @@ on("chat:message", function(msg) {
     if (msg.type == "api"){
         var apiMsgPrefix = '!ch';
         var apiMsgStart = apiMsgPrefix + ' start ';
+        var apiMsgNextTurn = apiMsgPrefix + ' nt';
         var apiMsgEnd = apiMsgPrefix + ' end';
 
         try {
@@ -25,6 +26,13 @@ on("chat:message", function(msg) {
                 showCurrentCombatList();
 
                 log(currentCombatList);
+            }
+
+            // 다음 차례로 넘기기(!ch nt)
+            if (msg.content.indexOf(apiMsgNextTurn) === 0 && isCombating()) {
+                const msgContent = msg.content.replace(apiMsgNextTurn, '');
+                currentCombatOrder += 1;
+                showCurrentCombatList();
             }
 
             // 전투 종료(!ch end)
