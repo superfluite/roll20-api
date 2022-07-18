@@ -21,9 +21,8 @@ on("chat:message", function(msg) {
         
                 characterList.sort((a, b) => {return getCharacterDex(b.id) - getCharacterDex(a.id)});
                 currentCombatList = characterList.slice();
-                const resultText = characterList.map(obj => obj.get('name') + '(' + getCharacterDex(obj.id) + ')').join(' >> ');
-                sendChat('', '/desc 전투 순서');
-                sendChat('', '/desc ' + resultText);
+                sendChat('', '/desc ▼ 전투 개시 ▼');
+                showCurrentCombatList();
 
                 log(currentCombatList);
             }
@@ -48,4 +47,16 @@ function getCharacterDex(charId) {
 
 function isCombating() {
     return currentCombatList.length > 0;
+}
+
+function showCurrentCombatList() {
+    const style = '[%s](#" style="font-weight:normal; font-style:normal;)';
+    const currentStyle = '[%s](#" style="font-weight:bold; font-style:normal;)';
+    const resultText = currentCombatList.map(
+        function(obj, index){
+            const turn = obj.get('name') + '(' + getCharacterDex(obj.id) + ')';
+            return index === currentCombatOrder ? currentStyle.replace('%s', turn) : style.replace('%s', turn);
+        }
+    ).join(' [>>](#" style="font-weight:normal; font-style:normal;) ');
+    sendChat('', '/desc § ' + resultText + ' §');
 }
