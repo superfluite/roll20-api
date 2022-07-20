@@ -20,7 +20,13 @@ on("chat:message", function(msg) {
                     }
                 );
         
-                characterList.sort((a, b) => {return getCharacterDex(b.id) - getCharacterDex(a.id)});
+                characterList.sort((a, b) => {
+                    let result = getCharacterDex(b.id) - getCharacterDex(a.id);
+                    if (result !== 0) { return result }
+                    else {
+                        return getCharacterBattleSkill(b.id) - getCharacterBattleSkill(a.id);
+                    }
+                });
                 currentCombatList = characterList.slice();
                 sendChat('', '/desc ▼ 전투 개시 ▼');
                 showCurrentCombatList();
@@ -63,6 +69,15 @@ function getCharacterHP(charId, max=false) {
         hp = (getCharacterIntAttr(charId, 'con') + getCharacterIntAttr(charId, 'siz')) % 10;
     }
     return hp
+}
+
+function getCharacterBattleSkill(charId, skill='fighting_brawl') {
+    let skillValue = getCharacterIntAttr(charId, skill);
+    if (isNaN(skillValue)) {
+        skillValue = 25; // # FIXME 근접전(격투) 기본치임. 격투 기능에 따라 기본치가 다르므로 이를 고려해야 함
+        createObj('attribute', {name: skill, current: skillValue, characterId: charId});
+    }
+    return skillValue;
 }
 
 function isCombating() {
