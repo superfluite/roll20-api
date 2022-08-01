@@ -1,5 +1,6 @@
 let currentCombatList = [];
 let currentCombatOrder = 0;
+let round = 1;
 
 on("chat:message", function(msg) {
     if (msg.type == "api"){
@@ -33,6 +34,7 @@ on("chat:message", function(msg) {
                 });
                 currentCombatList = characterList.slice();
                 sendChat('', '/desc ▼ 전투 개시 ▼');
+                sendChat('', '/desc 라운드 ' + round);
                 showCurrentCombatList();
 
                 log(currentCombatList);
@@ -44,6 +46,8 @@ on("chat:message", function(msg) {
                 currentCombatOrder += 1;
                 if(currentCombatOrder >= currentCombatList.length) {
                     currentCombatOrder = 0;
+                    round += 1;
+                    sendChat('', '/desc 라운드 ' + round);
                 }
                 showCurrentCombatList();
             }
@@ -52,6 +56,7 @@ on("chat:message", function(msg) {
             if (calledByGM && msg.content.indexOf(apiMsgEnd) === 0 && isCombating()) {
                 currentCombatList.length = 0;
                 currentCombatOrder = 0;
+                round = 1;
                 sendChat('', '/desc ▲ 전투 종료 ▲');
 
                 log(currentCombatList);
