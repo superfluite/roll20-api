@@ -8,9 +8,13 @@ on("chat:message", function(msg) {
         var apiMsgNextTurn = apiMsgPrefix + ' nt';
         var apiMsgEnd = apiMsgPrefix + ' end';
 
+        const currentCharacter = currentCombatList.length > 0 ? currentCombatList[currentCombatOrder] : undefined;
+        const calledByGM = playerIsGM(msg.playerid);
+        const calledByCurrentPlayer = currentCharacter !== undefined ? currentCharacter.get('controlledby').split(',').includes(msg.playerid) : false;
+
         try {
             // 전투 시작(!ch start)
-            if (msg.content.indexOf(apiMsgStart) === 0 && !isCombating()) {
+            if (calledByGM && msg.content.indexOf(apiMsgStart) === 0 && !isCombating()) {
                 const msgContent = msg.content.replace(apiMsgStart, '');
                 const characterNameList = msgContent.split(',');
                 var characterList = filterObjs(
@@ -35,7 +39,7 @@ on("chat:message", function(msg) {
             }
 
             // 다음 차례로 넘기기(!ch nt)
-            if (msg.content.indexOf(apiMsgNextTurn) === 0 && isCombating()) {
+            if ((calledByGM || calledByCurrentPlayer) && msg.content.indexOf(apiMsgNextTurn) === 0 && isCombating()) {
                 const msgContent = msg.content.replace(apiMsgNextTurn, '');
                 currentCombatOrder += 1;
                 if(currentCombatOrder >= currentCombatList.length) {
@@ -45,7 +49,7 @@ on("chat:message", function(msg) {
             }
 
             // 전투 종료(!ch end)
-            if (msg.content.indexOf(apiMsgEnd) === 0 && isCombating()) {
+            if (calledByGM && msg.content.indexOf(apiMsgEnd) === 0 && isCombating()) {
                 currentCombatList.length = 0;
                 currentCombatOrder = 0;
                 sendChat('', '/desc ▲ 전투 종료 ▲');
