@@ -1,3 +1,5 @@
+// ver 0.1.0
+
 let currentCombatList = [];
 let currentCombatOrder = 0;
 let round = 1;
