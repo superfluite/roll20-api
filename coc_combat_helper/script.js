@@ -38,6 +38,9 @@ on("chat:message", function(msg) {
             if (msg.content.indexOf(apiMsgNextTurn) === 0 && isCombating()) {
                 const msgContent = msg.content.replace(apiMsgNextTurn, '');
                 currentCombatOrder += 1;
+                if(currentCombatOrder >= currentCombatList.length) {
+                    currentCombatOrder = 0;
+                }
                 showCurrentCombatList();
             }
 
